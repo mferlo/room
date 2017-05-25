@@ -22,11 +22,11 @@ class Inventory extends Component {
 
     componentDidMount() {
         PubSub.subscribe(
-            Topic.PickedUpItem,
+            Topic.Item.PickedUp,
             (_, item) => this.setState(prev => ({ items: prev.items.concat(item)})));
 
         PubSub.subscribe(
-            Topic.ConsumeItem,
+            Topic.Item.Consumed,
             (_, id) => this.consumeItem(id));
     }
 

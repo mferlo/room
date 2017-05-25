@@ -21,7 +21,7 @@ class MessageWindow extends Component {
             (_, data) => this.addMessage(data));
 
         PubSub.subscribe(
-            Topic.PickedUpItem,
+            Topic.Item.PickedUp,
             (_, data) => this.addMessage(`You picked up ${data.props.description}`));
     }
 

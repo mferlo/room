@@ -7,7 +7,7 @@ import Topic from './Topic.js';
 // static in the room). Remember that css can do a lot of the heavy lifting...
 // Or: KISS/YAGNI. Unclear.
 
-// Make everything be the same datatype (see Inventory PickUp and Consume for the awkwardness here).
+// FIXME: is the payload of messages the item itself, or the item id?
 
 class Item extends Component {
     constructor(props) {
@@ -20,7 +20,7 @@ class Item extends Component {
     handleClick(event) {
         if (!this.state.pickedUp) {
             this.setState(_ => ({pickedUp: true}));
-            PubSub.publish(Topic.PickedUpItem, this);
+            PubSub.publish(Topic.Item.PickedUp, this);
         } else {
             // Alternately: "activate" the item so it may interact with
             // something in the room. I kind of like the auto-usage, though:
@@ -79,7 +79,7 @@ class Door extends Component {
     componentDidMount() {
         // FIXME: unclear if this approach will work or is fundamentally broken.
         PubSub.subscribe(
-            Topic.PickedUpItem,
+            Topic.Item.PickedUp,
             (_, item) => this.makeUnlockableIfKey(item));
     }
 
@@ -123,7 +123,7 @@ class Drawer extends Component {
     }
 
     componentDidMount() {
-        this.token = PubSub.subscribe(Topic.PickedUpItem, (_, item) => this.pickedUpItem(item));
+        this.token = PubSub.subscribe(Topic.Item.PickedUp, (_, item) => this.pickedUpItem(item));
     }
 
     componentWillUnmount() {
