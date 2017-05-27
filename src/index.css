@@ -27,7 +27,7 @@ body {
     width: 80px;
 }
 
-.drawer {
+#drawer {
     border: 1px solid blue;
     position: absolute;
     top: 50px;

@@ -1,49 +1,19 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
-import Topic from './Topic';
+import Item from './Item.js';
 
 class Inventory extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = { items: [] };
-
-        this.consumeItem = this.consumeItem.bind(this);
+    renderListItem(item) {
+        return (<li key={item.Id}>
+                  <Item id={item.Id} type={item.Type} description={item.Description} />
+                </li>);
     }
-
-    consumeItem(id) {
-        var item = this.items.find(i => i.Id === id);
-        if (item) {
-            this.setState(prev => ({ items: prev.items.filter(i => i !== item)}));
-            PubSub.publish(Topic.Message, `${item.Description} disappears.`);
-        }
-
-    }
-
-    componentDidMount() {
-        PubSub.subscribe(
-            Topic.Item.PickedUp,
-            (_, item) => this.setState(prev => ({ items: prev.items.concat(item)})));
-
-        PubSub.subscribe(
-            Topic.Item.Consumed,
-            (_, id) => this.consumeItem(id));
-    }
-
-    // FIXME unsub
-    // componentWillUnmount() {
-
-    renderInventory() {
-        return this.state.items.map(item => <li key={item.props.id}>{item.render()}</li>);
-    }
-
+    
     render() {
         return (<div id="inventory">
                   Inventory
                   <br />
-                  <ul>
-                    {this.renderInventory()}
-                  </ul>
+                  <ul>{this.props.items.map(item => this.renderListItem(item))}</ul>
                 </div>);
     }
 }

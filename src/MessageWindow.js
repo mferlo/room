@@ -1,45 +1,20 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
-import Topic from './Topic.js';
+
+class Message extends Component {
+    render() {
+        const id = this.props.messageId;
+        return (<div id={"message-" + id} className="message">{id} {this.props.message}</div>);
+    }
+}
 
 class MessageWindow extends Component {
-    constructor(props) {
-        super(props);
-
-        var initialMessages = this.props.initialState;
-        this.state = { messages: initialMessages };
-    }
-
-    addMessage(msg) {
-        this.setState(
-            prev => ({ messages: prev.messages.concat(msg) }));
-    }
-
-    componentDidMount() {
-        PubSub.subscribe(
-            Topic.Message,
-            (_, data) => this.addMessage(data));
-
-        PubSub.subscribe(
-            Topic.Item.PickedUp,
-            (_, data) => this.addMessage(`You picked up ${data.props.description}`));
-    }
-
-    // FIXME unsub
-    // componentWillUnmount() {
-    
-    renderMessages() {
-        // FIXME: make key
-        return this.state.messages
-            .slice(-5)
-            .reverse()
-            .map(m => (<div>{m}</div>));
+    renderMessage(message) {
+        return (<Message key={message.key} messageId={message.key} message={message.msg} />);
     }
 
     render() {
-        return (<div id="messages">{this.renderMessages()}</div>);
+        return (<div id="messages">{this.props.messages.slice(-5).map(m => this.renderMessage(m))}</div>);
     }
-        
 }
 
 export default MessageWindow;
