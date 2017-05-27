@@ -15,7 +15,6 @@ class Door extends Component {
 }
 
 class Drawer extends Component {
-
     renderDrawer() {
         if (this.props.open) {
             return "An open drawer";
@@ -26,36 +25,29 @@ class Drawer extends Component {
 
     renderContents() {
         if (this.props.contents) {
-            return this.props.contents.map(
-                item => (<div key={item.Id}>
-                           <Item id={item.Id} type={item.Type} description={item.Description} hint={item.Hint} />
-                         </div>)
-            );
+            return this.props.contents.map(item =>
+                (<div key={item.Id}>
+                   <Item id={item.Id} type={item.Type} description={item.Description} hint={item.Hint} />
+                 </div>));
         } else {
             return <div>(empty)</div>;
         }
     }
-    
     render() {
-        var contents = <span><hr />{this.renderContents()}</span>;
-        
         return (<div id="drawer" onClick={this.handleClick}>
                 {this.renderDrawer()}
-                {this.props.open ? contents : null}
+                {this.props.open ? <span><hr />{this.renderContents()}</span> : null}
                 </div>);
     }
 }
 
 class Room extends Component {
-
     renderDrawer(drawer) {
         return <Drawer className="drawer" open={drawer.open} contents={drawer.contents} />;
     }
-
     renderDoor(door) {
-        return <Door className="door" open={door.open} locked={door.lock} />;
+        return <Door className="door" open={door.open} locked={door.locked} />;
     }
-    
     render() {
         return (
             <div id="room">

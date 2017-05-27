@@ -3,17 +3,8 @@ import Room from './Room.js';
 import Inventory from './Inventory.js';
 import MessageWindow from './MessageWindow.js';
 
-class App extends Component {
-
-    constructor(props) {
-        super(props);
-
-        this.state = this.initialState();
-    }
-    
-    initialState() {
-        // FIXME: Get this from the DB
-
+class AppState {
+    static getInitialState() {
         const key = { Id: 42, Type: 'Key', Description: 'An ordinary key', Hint: 'Maybe this unlocks something...' };
         const redHerring = { Id: 123, Type: 'Fluff', Description: 'A Red Herring', Hint: 'Something smells fishy about this whole thing.' };
         
@@ -29,23 +20,23 @@ class App extends Component {
         };
     }
 
-    appendMessage(prev, message) {
+    static appendMessage(prev, message) {
         return [...prev.messages, { key: prev.messages.length, msg: message }];
     }
 
-    getItemFromInventory(itemId) {
-        return this.state.inventory.find(item => item.Id === itemId);
+    static getItemFromInventory(prev, itemId) {
+        return prev.inventory.find(item => item.Id === itemId);
     }
 
-    appendItemToInventory(prev, item) {
+    static appendItemToInventory(prev, item) {
         return [...prev.inventory, item];
     }
 
-    removeItemFromInventory(prev, item) {
+    static removeItemFromInventory(prev, item) {
         return prev.inventory.filter(i => item.Id !== i.Id);
     }
 
-    clickDrawer(prev) {
+    static clickDrawer(prev) {
         const d = prev.room.drawer;
         const msg = `You ${d.open ? 'closed' : 'opened'} the drawer`;
         return {
@@ -54,9 +45,10 @@ class App extends Component {
         };
     }
 
-    clickDoor(prev) {
+    static clickDoor(prev) {
         const oldDoor = prev.room.door;
-        const key = this.getItemFromInventory(prev.room.door.unlockedBy.Id);
+        const keyId = prev.room.door.unlockedBy.Id;
+        const key = this.getItemFromInventory(prev, keyId);
 
         let newDoor = oldDoor;
         let newInventory = prev.inventory;
@@ -82,8 +74,8 @@ class App extends Component {
         };
     }
 
-    clickItem(prev, itemId) {
-        let item = this.getItemFromInventory(itemId);
+    static clickItem(prev, itemId) {
+        let item = this.getItemFromInventory(prev, itemId);
 
         if (item) {
             // Or "activate", unclear.
@@ -94,8 +86,6 @@ class App extends Component {
             // For now, the only place it can be is here...
             item = prev.room.drawer.contents.filter(i => itemId === i.Id)[0]; //.Single()
             const rest = prev.room.drawer.contents.filter(i => itemId !== i.Id);
-
-            console.log('Adding', item);
 
             return {
                 room: {
@@ -108,28 +98,40 @@ class App extends Component {
         }
     }
 
-    handleClick(event) {
-        // This is almost certainly the wrong way to do it, but holy cow is it convenient.
-        const id = event.target.id;
-        console.log(`Clicked on ${id}`);
-
+    static handleClick(id, prev) {
         if (id === 'drawer') {
-            this.setState(prev => this.clickDrawer(prev));
+            return this.clickDrawer(prev);
         } else if (id === 'door') {
-            this.setState(prev => this.clickDoor(prev));
+            return this.clickDoor(prev);
         } else {
             const itemId = Number.parseInt(id, 10);
             if (itemId) {
-                this.setState(prev => this.clickItem(prev, itemId));
+                return this.clickItem(prev, itemId);
             } else {
-                console.log(`Ignoring click on ${id}`);
+                return {};
             }
         }
-            
+    }
+}
+
+
+class App extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = AppState.getInitialState();
+    }
+
+    handleClick(event) {
+        // This is almost certainly the wrong way to do it, but holy cow is it convenient.
+        // Might be better for components to encode their state in the `data-` attributes.
+        event.persist();
+        this.setState(prev => AppState.handleClick(event.target.id, prev));
     }
 
     render() {
-        return (<div id="app" onClick={e => this.handleClick(e)}>
+        return (<div id="app" onClick={event => this.handleClick(event)}>
                   <Room objects={this.state.room} />
                   <br />
                   <Inventory items={this.state.inventory} />
