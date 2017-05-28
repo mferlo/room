@@ -41,19 +41,48 @@ class Drawer extends Component {
     }
 }
 
+class ViewChange extends Component {
+    render() {
+        return (
+            <span data-destination={this.props.destination}>
+                {this.props.arrow}
+            </span>);
+    }
+}
+
 class Room extends Component {
-    renderDrawer(drawer) {
-        return <Drawer className="drawer" open={drawer.open} contents={drawer.contents} />;
+    renderDrawer(objects) {
+        if (objects.drawer) {
+            return <Drawer className="drawer" open={objects.drawer.open} contents={objects.drawer.contents} />;
+        }
     }
-    renderDoor(door) {
-        return <Door className="door" open={door.open} locked={door.locked} />;
+    
+    renderDoor(objects) {
+        if (objects.door) {
+            return <Door className="door" open={objects.door.open} locked={objects.door.locked} />;
+        }
     }
+
+    renderLeftArrow(viewInfo) {
+        if (viewInfo.leftGoesTo !== undefined) {
+            return <ViewChange destination={viewInfo.leftGoesTo} className="left-arrow" arrow="[go left]" />
+        }
+    }
+
+    renderRightArrow(viewInfo) {
+        if (viewInfo.rightGoesTo !== undefined) {
+            return <ViewChange destination={viewInfo.rightGoesTo} className="right-arrow" arrow="[go right]" />
+        }
+    }
+
     render() {
         return (
             <div id="room">
                 <span>Room</span>
-                {this.renderDrawer(this.props.objects.drawer)}
-                {this.renderDoor(this.props.objects.door)}
+                {this.renderLeftArrow(this.props.objects.viewInfo)}
+                {this.renderRightArrow(this.props.objects.viewInfo)}
+                {this.renderDrawer(this.props.objects)}
+                {this.renderDoor(this.props.objects)}
             </div>
         );
     }
