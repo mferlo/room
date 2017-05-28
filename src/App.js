@@ -5,8 +5,8 @@ import MessageWindow from './MessageWindow.js';
 
 class AppState {
     static getInitialState() {
-        const key = { Id: 42, Type: 'Key', Description: 'An ordinary key', Hint: 'Maybe this unlocks something...' };
-        const redHerring = { Id: 123, Type: 'Fluff', Description: 'A Red Herring', Hint: 'Something smells fishy about this whole thing.' };
+        const key = { Id: 42, Description: 'An ordinary key', Hint: 'Maybe this unlocks something...' };
+        const redHerring = { Id: 123, Description: 'A Red Herring', Hint: 'Something smells fishy about this whole thing.' };
         
         return {
             roomView: 0,
@@ -14,11 +14,13 @@ class AppState {
             // This is gross and dumb, but it plays nicely with the setState merge logic.
             room0: {
                 viewInfo: { rightGoesTo: 1 },
+                drawer: { open: true },
                 door: { open: false, locked: true, unlockedBy: key }
             },
             room1: {
                 viewInfo: { leftGoesTo: 0 },
-                drawer: { open: false, contents: [ key, redHerring ] }
+                drawer: { open: false, contents: [ key, redHerring ] },
+                door: { open: false, locked: true, unlockedBy: { Id: -1 } }
             },
 
             inventory: [],
@@ -59,16 +61,15 @@ class AppState {
     static clickDoor(prev) {
         const roomKey = this.currentRoomKey(prev);
         const room = prev[roomKey];
-
         const oldDoor = room.door;
-        const keyId = room.door.unlockedBy.Id;
-        const key = this.getItemFromInventory(prev, keyId);
 
         let newDoor = oldDoor;
         let newInventory = prev.inventory;
         let msg;
 
         if (oldDoor.locked) {
+            const keyId = room.door.unlockedBy.Id;
+            const key = this.getItemFromInventory(prev, keyId);
             if (key) {
                 msg = "You unlocked the door";
                 newDoor.locked = false;
@@ -116,18 +117,12 @@ class AppState {
     }
 
     static handleClick(target, prev) {
-        const id = target.id;
-        const itemId = Number.parseInt(id, 10);
-
-        if (id === 'drawer') {
-            return this.clickDrawer(prev);
-        } else if (id === 'door') {
-            return this.clickDoor(prev);
-        } else if (target.dataset.destination !== undefined) {
-            return { roomView: target.dataset.destination };
-        } else if (itemId) {
-            return this.clickItem(prev, itemId);
-        } else {
+        switch (target.dataset.type) {
+        case 'drawer': return this.clickDrawer(prev);
+        case 'door': return this.clickDoor(prev);
+        case 'item': return this.clickItem(prev, Number.parseInt(target.dataset.id, 10));
+        case 'viewchange': return { roomView: target.dataset.destination };
+        default:
             console.log('Unknown target', target);
             return {};
         }
@@ -144,8 +139,6 @@ class App extends Component {
     }
 
     handleClick(event) {
-        // This is almost certainly the wrong way to do it, but holy cow is it convenient.
-        // Might be better for components to encode their state in the `data-` attributes.
         event.persist();
         this.setState(prev => AppState.handleClick(event.target, prev));
     }
