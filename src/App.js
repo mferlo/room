@@ -5,8 +5,32 @@ import MessageWindow from './MessageWindow.js';
 
 class AppState {
     static getInitialState() {
-        const key = { Id: 42, Description: 'An ordinary key', Hint: 'Maybe this unlocks something...' };
-        const redHerring = { Id: 123, Description: 'A Red Herring', Hint: 'Something smells fishy about this whole thing.' };
+        const key = {
+            Id: 1,
+            Type: 'Item',
+            Description: 'An ordinary key',
+            Hint: 'Maybe this unlocks something...'
+        };
+        const redHerring = {
+            Id: 2,
+            Type: 'Item',
+            Description: 'A Red Herring',
+            Hint: 'Something smells fishy about this whole thing.'
+        };
+        const pole = {
+            Id: 3,
+            Type: 'Item',
+            Description: 'A Ten-Foot Pole',
+            Hint: 'You can do all sorts of useful stuff with this.'
+        };
+        const puzzle = {
+            Id: 4,
+            Type: 'Puzzle',
+            Description: 'Very Mysterious Indeed', // FIXME: figure out how much in common
+            Hint: '',
+            POC_Answer: 'Hello', // will be web call & unknown to client
+            Rewards: pole
+        };
         
         return {
             roomView: 0,
@@ -14,7 +38,7 @@ class AppState {
             // This is gross and dumb, but it plays nicely with the setState merge logic.
             room0: {
                 viewInfo: { rightGoesTo: 1 },
-                drawer: { open: true },
+                drawer: { open: true, contents: [ puzzle ] },
                 door: { open: false, locked: true, unlockedBy: key }
             },
             room1: {
@@ -149,7 +173,7 @@ class App extends Component {
         return (<div id="app" onClick={event => this.handleClick(event)}>
                   <Room objects={room} />
                   <br />
-                  <Inventory items={this.state.inventory} />
+                  <Inventory contents={this.state.inventory} />
                   <MessageWindow messages={this.state.messages} />
                 </div>);
     }

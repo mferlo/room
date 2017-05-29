@@ -3,18 +3,28 @@ import Item from './Item.js';
 
 class Inventory extends Component {
 
-    renderListItem(item) {
-        return (<li key={item.Id}>
-                  <Item id={item.Id} type={item.Type} description={item.Description} />
-                </li>);
+    renderItem(item) {
+        return <Item id={item.Id} type={item.Type} description={item.Description} />;
     }
     
+    renderItems(items) {
+        if (!items || !items.length) {
+            return null;
+        }
+
+        return (<ul>
+                    {items.map(item => <li key={`${item.Id}-${item.Type}`}>{this.renderItem(item)}</li>)}
+                </ul>);
+    }
+
     render() {
-        return (<div id="inventory">
-                  Inventory
-                  <br />
-                  <ul>{this.props.items.map(item => this.renderListItem(item))}</ul>
-                </div>);
+        const items = this.props.contents.filter(item => item.Type === "Item");
+        const puzzles = this.props.contents.filter(item => item.Type === "Puzzle");
+        return (
+            <div id="inventory">
+                <div id="item-inventory">{this.renderItems(items)}</div>
+                <div id="puzzle-inventory">{this.renderItems(puzzles)}</div>
+            </div>);
     }
 }
 
