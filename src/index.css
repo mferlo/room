@@ -30,6 +30,19 @@ body {
     border: 1px solid orange;
 }
 
+.zoomedPuzzle {
+    border: 1px solid black;
+    background-color: yellow;
+    position: absolute;
+
+    height: 50%;
+    top: 50px;
+    left: 50px;
+    width: 400px;
+    height: 200px;
+    z-index: 1;
+}
+
 .door {
     border: 1px solid brown;
     position: absolute;

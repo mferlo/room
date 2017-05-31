@@ -7,7 +7,7 @@ class Door extends Component {
             return (<img src="https://morbotron.com/gif/S07E11/35869/41916.gif?b64lines="
                          alt="But what fresh horrors await us on the other side?"/>);
         } else {
-            return (<div className="door" data-type="door">
+            return (<div className="door" data-type="Door">
                     {this.props.locked ? 'A locked' : this.props.open ? 'An open' : 'A closed'} door
                     </div>);
         }
@@ -34,7 +34,7 @@ class Drawer extends Component {
         }
     }
     render() {
-        return (<div className="drawer" data-type="drawer" onClick={this.handleClick}>
+        return (<div className="drawer" data-type="Drawer" onClick={this.handleClick}>
                 {this.renderDrawer()}
                 {this.props.open ? <span><hr />{this.renderContents()}</span> : null}
                 </div>);

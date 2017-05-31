@@ -33,6 +33,7 @@ class AppState {
         };
         
         return {
+            zoomedInOn: null,
             roomView: 0,
 
             // This is gross and dumb, but it plays nicely with the setState merge logic.
@@ -113,46 +114,89 @@ class AppState {
         };
     }
 
+    static pickUpItem(prev, itemId) {
+        console.log('pick up', prev, itemId);
+        const roomKey = this.currentRoomKey(prev);
+        const room = prev[roomKey];
+
+        // FIXME: For now, the only place it can be is in this drawer...
+        const item = room.drawer.contents.filter(i => itemId === i.Id)[0];
+        const rest = room.drawer.contents.filter(i => itemId !== i.Id);
+
+        return {
+            [roomKey]: { ...room, drawer: { ...room.drawer, contents: rest } },
+            inventory: this.appendItemToInventory(prev, item),
+            messages: this.appendMessage(prev, `Picked up: ${item.Description}`)
+        };
+    }
+
+    static activateItem(prev, item) {
+        console.log('activate', prev, item);
+
+        switch (item.Type) {
+        case 'Item': return { messages: this.appendMessage(prev, `${item.Description} ${item.Hint}`) };
+        case 'Puzzle': return { zoomedInOn: item.Id };
+        default: console.log(item); return null;
+        }
+    }
+
     static clickItem(prev, itemId) {
-        let item = this.getItemFromInventory(prev, itemId);
+        const item = this.getItemFromInventory(prev, itemId);
         if (item) {
-            // Or "activate", unclear.
-            return {
-                messages: this.appendMessage(prev, `${item.Description} ${item.Hint}`)
-            };
+            return this.activateItem(prev, item);
         } else {
-            const roomKey = this.currentRoomKey(prev);
-            const room = prev[roomKey];
-
-            // For now, the only place it can be is in this drawer...
-            item = room.drawer.contents.filter(i => itemId === i.Id)[0]; //.Single()
-            const rest = room.drawer.contents.filter(i => itemId !== i.Id);
-
-            return {
-                [roomKey]: { ...room, drawer: { ...room.drawer, contents: rest } },
-                inventory: this.appendItemToInventory(prev, item),
-                messages: this.appendMessage(prev, `Picked up: ${item.Description}`)
-            };
+            return this.pickUpItem(prev, itemId);
         }
     }
 
     static currentRoomKey(state) {
-        return "room" + state.roomView
+        return "room" + state.roomView;
     }
 
-    static handleClick(target, prev) {
+    static handleNormalClick(prev, target) {
         switch (target.dataset.type) {
-        case 'drawer': return this.clickDrawer(prev);
-        case 'door': return this.clickDoor(prev);
-        case 'item': return this.clickItem(prev, Number.parseInt(target.dataset.id, 10));
+        case 'Drawer': return this.clickDrawer(prev);
+        case 'Door': return this.clickDoor(prev);
+        case 'Item': // fall-through
+        case 'Puzzle': return this.clickItem(prev, Number.parseInt(target.dataset.id, 10));
+
         case 'viewchange': return { roomView: target.dataset.destination };
         default:
             console.log('Unknown target', target);
             return {};
         }
     }
+
+    static handleZoomedClick(prev, target) {
+        const targetId = Number.parseInt(target.dataset.id, 10); // FIXME are these really strings?
+        if (targetId === prev.zoomedInOn) {
+            console.log("Clicked puzzle");
+            return null;
+        } else {
+            console.log('Clicked not-puzzle: ', target);
+            return { zoomedInOn: null };
+        }
+    }
+
+    static handleClick(prev, target) {
+        if (prev.zoomedInOn !== null) {
+            return this.handleZoomedClick(prev, target);
+        } else {
+            return this.handleNormalClick(prev, target);
+        }
+    }
 }
 
+class ZoomedPuzzle extends Component {
+    render() {
+        const id = this.props.id;
+        if (id) {
+            return (<div className="zoomedPuzzle" data-id={id}>{id}</div>);
+        } else {
+            return null;
+        }
+    }
+}
 
 class App extends Component {
 
@@ -164,13 +208,15 @@ class App extends Component {
 
     handleClick(event) {
         event.persist();
-        this.setState(prev => AppState.handleClick(event.target, prev));
+        this.setState(prev => AppState.handleClick(prev, event.target));
     }
 
     render() {
         const currentRoomKey = AppState.currentRoomKey(this.state);
         const room = this.state[currentRoomKey];
+
         return (<div id="app" onClick={event => this.handleClick(event)}>
+                  <ZoomedPuzzle id={this.state.zoomedInOn} />
                   <Room objects={room} />
                   <br />
                   <Inventory contents={this.state.inventory} />
