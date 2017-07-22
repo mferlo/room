@@ -4,6 +4,7 @@ import Inventory from './Inventory.js';
 import MessageWindow from './MessageWindow.js';
 
 class AppState {
+
     static getInitialState() {
         const key = {
             Id: 1,
@@ -31,7 +32,9 @@ class AppState {
             POC_Answer: 'Hello', // will be web call & unknown to client
             Rewards: pole
         };
-        
+
+        const fakePuzzleInventoryForTesting = AppState.makeFakePuzzles();
+
         return {
             zoomedInOn: null,
             roomView: 0,
@@ -48,11 +51,30 @@ class AppState {
                 door: { open: false, locked: true, unlockedBy: { Id: -1 } }
             },
 
-            inventory: [],
+            inventory: fakePuzzleInventoryForTesting,
 
             // Explicitly indexing makes MessageWindow/Message super-simple.
             messages: [ { key: 0, msg: "Welcome to the Twilight Zone" } ]
         };
+    }
+
+    static makeFakePuzzles() {
+        const count = 15;
+        const arcs = [ 'Sight', 'Sound', 'Taste' ];
+        
+        let puzzles = [];
+        for (let i = 0; i < count; i++) {
+            const id = 100 + i;
+            const puzzle = {
+                Id: id,
+                Type: 'Puzzle',
+                Description: `Puzzle ${id}`,
+                Arc: arcs[i % arcs.length]
+            }
+            puzzles.push(puzzle);
+        }
+
+        return puzzles;
     }
 
     static appendMessage(prev, message) {
@@ -218,8 +240,8 @@ class App extends Component {
         return (<div id="app" onClick={event => this.handleClick(event)}>
                   <ZoomedPuzzle id={this.state.zoomedInOn} />
                   <Room objects={room} />
-                  <br />
                   <Inventory contents={this.state.inventory} />
+                  <br />
                   <MessageWindow messages={this.state.messages} />
                 </div>);
     }

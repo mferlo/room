@@ -1,20 +1,28 @@
 body {
-    width: 500px;
-    margin: 0;
-    padding: 0;
     font-family: sans-serif;
 }
 
+#app {
+    width: 800px;
+    height: 600px;
+}
+
 .room {
-    height: 200px;
+    float: left;
+    width: 60%;
+    height: 500px;
+    display: block;
     border: 1px solid black;
 }
 
 #messages {
+    display: block;
     border: 1px solid green;
 }
 
 #inventory {
+    border: 1px solid orange;
+    display: float;
     overflow: hidden;
 }
 
@@ -25,9 +33,7 @@ body {
 }
 
 #puzzle-inventory {
-    width: 49%;
-    float: left;
-    border: 1px solid orange;
+    width: 100%;
 }
 
 .zoomedPuzzle {

@@ -17,13 +17,25 @@ class Inventory extends Component {
                 </ul>);
     }
 
+    renderPuzzle(puzzle) {
+        return puzzle.Id;
+    }
+
+    renderPuzzles(puzzles) {
+        return (<ul>
+                {puzzles.map(p => <li key={`Puzzle-${p.Id}`}>{this.renderPuzzle(p)}</li>)}
+                </ul>);
+    }
+
     render() {
         const items = this.props.contents.filter(item => item.Type === "Item");
         const puzzles = this.props.contents.filter(item => item.Type === "Puzzle");
+
+        // <div id="item-inventory">{this.renderItems(items)}</div>
+
         return (
             <div id="inventory">
-                <div id="item-inventory">{this.renderItems(items)}</div>
-                <div id="puzzle-inventory">{this.renderItems(puzzles)}</div>
+                <div id="puzzle-inventory">{this.renderPuzzles(puzzles)}</div>
             </div>);
     }
 }
