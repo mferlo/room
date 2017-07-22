@@ -59,7 +59,7 @@ class AppState {
     }
 
     static makeFakePuzzles() {
-        const count = 15;
+        const count = 25;
         const arcs = [ 'Sight', 'Sound', 'Taste' ];
         
         let puzzles = [];
@@ -69,7 +69,8 @@ class AppState {
                 Id: id,
                 Type: 'Puzzle',
                 Description: `Puzzle ${id}`,
-                Arc: arcs[i % arcs.length]
+                Arc: arcs[i % arcs.length],
+                Solved: false
             }
             puzzles.push(puzzle);
         }
@@ -209,17 +210,6 @@ class AppState {
     }
 }
 
-class ZoomedPuzzle extends Component {
-    render() {
-        const id = this.props.id;
-        if (id) {
-            return (<div className="zoomedPuzzle" data-id={id}>{id}</div>);
-        } else {
-            return null;
-        }
-    }
-}
-
 class App extends Component {
 
     constructor(props) {
@@ -238,7 +228,6 @@ class App extends Component {
         const room = this.state[currentRoomKey];
 
         return (<div id="app" onClick={event => this.handleClick(event)}>
-                  <ZoomedPuzzle id={this.state.zoomedInOn} />
                   <Room objects={room} />
                   <Inventory contents={this.state.inventory} />
                   <br />
