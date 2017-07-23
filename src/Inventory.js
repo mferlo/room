@@ -22,6 +22,8 @@ class Inventory extends Component {
                 <span onClick={(e) => this.groupBy(e, "None")}>None</span>
                 &nbsp;/&nbsp;
                 <span onClick={(e) => this.groupBy(e, "Arc")}>Arc</span>
+                &nbsp;/&nbsp;
+                <span onClick={(e) => this.groupBy(e, "Solved")}>Solved</span>
             </div>
         );
     }
@@ -59,20 +61,22 @@ class Inventory extends Component {
     }
 
     renderGroupedList(groupName, contents) {
-        if (this.state.collapsedGroups.has(groupName)) {
-            return (<li className="groupHeader closed"
-                        key={`${groupName}-${contents.length}-closed`}
-                        onClick={e => this.toggleCollapsed(e, groupName)}>
-                      {groupName}
-                    </li>);
-        } else {
-            return (<li className="groupHeader opened"
-                        key={`${groupName}-${contents.length}-opened`}
-                        onClick={e => this.toggleCollapsed(e, groupName)}>
-                      {groupName}
-                      {this.renderUngroupedPuzzles(contents)}
-                    </li>);
+        const collapsed = this.state.collapsedGroups.has(groupName);
+        const state = collapsed ? "closed" : "opened";
+
+        let displayName = groupName;
+        if (groupName === "true") {
+            displayName = "Solved";
+        } else if (groupName === "false") {
+            displayName = "Unsolved";
         }
+
+        return (<li className={`groupHeader ${state}`}
+                    key={`${groupName}-${contents.length}-${state}`}
+                    onClick={e => this.toggleCollapsed(e, groupName)}>
+                      {displayName}
+                      {collapsed || this.renderUngroupedPuzzles(contents)}
+                </li>);
     }
 
     renderPuzzlesByGroup(puzzles, groupType, groupName) {
@@ -93,6 +97,7 @@ class Inventory extends Component {
         switch (this.state.groupBy) {
             case "None": return this.renderUngroupedPuzzles(puzzles);
             case "Arc": return this.renderPuzzlesByGroup(puzzles, "Arc");
+            case "Solved": return this.renderPuzzlesByGroup(puzzles, "Solved");
             default : alert(this.state.groupBy);
         }
     }
