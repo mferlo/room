@@ -60,7 +60,7 @@ class AppState {
 
     static makeFakePuzzles() {
         const count = 25;
-        const arcs = [ 'Sight', 'Sound', 'Taste' ];
+        const arcs = [ 'foo', 'bar', 'baz' ];
         
         let puzzles = [];
         for (let i = 0; i < count; i++) {

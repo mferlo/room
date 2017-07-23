@@ -34,9 +34,25 @@ li.groupHeader.opened { list-style-type: '- '; }
 li.puzzleItem { list-style: none; break-inside: avoid; }
 
 div.puzzle {
-    border: 1px solid green;
+    border: 1px solid black;
     width: 100px;
     height: 100px;
+    font-family: monospace;
+    font-size: x-large;
+}
+
+span.status { font-weight: bold; }
+span.solved { color: green; }
+span.unsolved { color: red; }
+
+span.groupType {
+    margin: 10px;
+    border: 2px solid black;
+    background-color: #22222222;
+}
+
+span.groupType.selected {
+    background-color: #0000FF88;
 }
 
 .door {
