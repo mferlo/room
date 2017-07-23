@@ -26,10 +26,20 @@ body {
     overflow-y: scroll;
 }
 
-ul.flat { list-style: none; columns: 2; }
-li.puzzleItem { list-style: none; break-inside: avoid; }
+ul.puzzleList {
+    list-style: none;
+    columns: 2;
+}
+  
+li.groupHeader.closed { list-style-type: '+ '; }
+li.groupHeader.opened { list-style-type: '- '; }
 
-.puzzle {
+li.puzzleItem {
+    list-style: none;
+    break-inside: avoid;
+}
+
+div.puzzle {
     border: 1px solid green;
     width: 100px;
     height: 100px;

@@ -70,7 +70,7 @@ class AppState {
                 Type: 'Puzzle',
                 Description: `Puzzle ${id}`,
                 Arc: arcs[i % arcs.length],
-                Solved: false
+                Solved: i % 4 === 0
             }
             puzzles.push(puzzle);
         }

@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 
 class Inventory extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = { groupBy: 'none' };
+    }
+
     renderPuzzle(puzzle) {
         return (<li className="puzzleItem" key={`Puzzle-${puzzle.Id}`}>
                   <div className="puzzle">
@@ -11,26 +18,36 @@ class Inventory extends Component {
                 </li>);
     }
 
-    orderForDisplay(items) {
+
+    renderUngroupedPuzzles(puzzles) {
+        const orderedPuzzles = this.orderForTwoColumnUL(puzzles);
+
+        return (<ul className="puzzleList">
+                  {orderedPuzzles.map(p => this.renderPuzzle(p))}
+                </ul>);
+    }
+
+    renderList() {
+        const puzzles = this.props.contents;
+
+        switch (this.state.groupBy) {
+            case "none": return this.renderUngroupedPuzzles(puzzles);
+            default: alert(this.state.groupBy);
+        }
+    }
+
+    render() {
+        return (<div id="puzzle-inventory">
+                {this.renderList()}
+                </div>);
+    }
+
+    orderForTwoColumnUL(items) {
         // CSS columns go down then right. We want to go right then down.
         // Rather than fight it, just re-order so the CSS does what we want:
         const evens = items.filter((_, i) => i % 2 === 0);
         const odds = items.filter((_, i) => i % 2 === 1);
         return evens.concat(odds);
-    }
-
-    renderPuzzles(puzzles) {
-        const sortedPuzzles = this.orderForDisplay(puzzles);
-        
-        return (<ul className="flat">
-                {sortedPuzzles.map(p => this.renderPuzzle(p))}
-                </ul>);
-    }
-
-    render() {
-        const puzzles = this.props.contents.filter(item => item.Type === "Puzzle");
-
-        return <div id="puzzle-inventory">{this.renderPuzzles(puzzles)}</div>
     }
 }
 
