@@ -27,6 +27,7 @@ body {
 }
 
 ul.puzzleList { columns: 2; }
+ul.puzzleList.singleItem { columns: 1; }
 
 li.groupHeader { list-style-position:inside; }
 li.groupHeader.closed { list-style-type: '+ '; }

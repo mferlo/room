@@ -61,16 +61,16 @@ class AppState {
     static makeFakePuzzles() {
         const count = 25;
         const arcs = [ '#', 'X', '@' ];
+
+        const titles = [ "Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "Ut", "at", "magna", "Vestibulum", "sed", "ante", "et", "orci", "mattis", "blandit", "nec", "in", "metus", "Mauris", "rhoncus", "maximus", "velit", "ac", "lobortis", "lacus", "sollicitudin", "faucibus", "Suspendisse", "et", "commodo", "sapien" ];
         
         let puzzles = [];
         for (let i = 0; i < count; i++) {
-            const id = 100 + i;
-            const puzzle = {
-                Id: id,
+            puzzles.push({
+                Title: titles[i].substring(0, 6),
                 Arc: arcs[i % arcs.length],
                 Solved: i % 4 === 0
-            }
-            puzzles.push(puzzle);
+            });
         }
 
         return puzzles;

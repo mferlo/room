@@ -15,6 +15,7 @@ class Inventory extends Component {
 
         this.state = {
             groupBy: 'All',
+            search: '',
             collapsedGroups: new Set(),
             filteredTypes: new Set(Inventory.filterTypes())
         };
@@ -54,9 +55,10 @@ class Inventory extends Component {
               ? <span className="status solved">☑</span>
               : <span className="status unsolved">☐</span>
 
-        return (<li className="puzzleItem" key={`Puzzle-${puzzle.Id}`}>
-                  <div className="puzzle" style={{backgroundColor: puzzle.Display}}>
-                    {solvedDisplay} {puzzle.Arc} {puzzle.Id}
+        return (<li className="puzzleItem" key={`Puzzle-${puzzle.Title}`}>
+                  <div className="puzzle">
+                    {puzzle.Arc} <span style={{float: 'right'}}>{solvedDisplay}</span>
+                    {puzzle.Title}
                   </div>
                 </li>);
     }
@@ -76,14 +78,15 @@ class Inventory extends Component {
     }
 
     isVisible(puzzle) {
-        return this.state.filteredTypes.has(puzzle.Arc)
+        return `${puzzle.Title}`.includes(this.state.search)
+            && this.state.filteredTypes.has(puzzle.Arc)
             && this.state.filteredTypes.has(puzzle.Solved ? '☑' : '☐');
     }
 
     renderUngroupedPuzzles(puzzles) {
         const orderedPuzzles = this.orderForTwoColumnUL(puzzles.filter(p => this.isVisible(p)));
-
-        return (<ul className="puzzleList">{orderedPuzzles.map(p => this.renderPuzzle(p))}</ul>);
+        const className = `puzzleList ${orderedPuzzles.length === 1 ? 'singleItem' : ''}`;
+        return (<ul className={className}>{orderedPuzzles.map(p => this.renderPuzzle(p))}</ul>);
     }
 
     renderGroupedList(groupName, contents) {
@@ -128,12 +131,20 @@ class Inventory extends Component {
         }
     }
 
+    searchTextChanged(event) {
+        event.stopPropagation();
+        this.setState({ search: event.target.value });
+    }
+
+    renderSearchBox() {
+        return <div>Title Search: <input type="text" onChange={e => this.searchTextChanged(e)} /></div>;
+    }
+
     render() {
         return (<div id="puzzle-inventory">
+                {this.renderSearchBox()}
                 {this.renderSelectors()}
-                <br />
                 {this.renderFilters()}
-                <br />
                 {this.renderList()}
                 </div>);
     }
