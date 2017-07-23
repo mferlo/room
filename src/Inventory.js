@@ -5,18 +5,23 @@ class Inventory extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { groupBy: 'None' };
+        this.state = {
+            groupBy: 'None',
+            collapsedGroups: new Set()
+        };
     }
 
-    groupBy(g) {
-        this.setState({ groupBy: g });
+    groupBy(event, groupName) {
+        event.stopPropagation();
+        this.setState({ groupBy: groupName });
     }
 
     renderSelector() {
         return (
             <div>
-                <span onClick={() => this.groupBy("None")}>None</span>
-                <span onClick={() => this.groupBy("Arc")}>Arc</span>
+                <span onClick={(e) => this.groupBy(e, "None")}>None</span>
+                &nbsp;/&nbsp;
+                <span onClick={(e) => this.groupBy(e, "Arc")}>Arc</span>
             </div>
         );
     }
@@ -31,6 +36,19 @@ class Inventory extends Component {
                 </li>);
     }
 
+    toggleCollapsed(event, groupName) {
+        event.stopPropagation();
+        this.setState(oldState => {
+            const groups = oldState.collapsedGroups;
+            if (groups.has(groupName)) {
+                groups.delete(groupName);
+            } else {
+                groups.add(groupName);
+            }
+
+            return { collapsedGroups: groups };
+        });
+    }
 
     renderUngroupedPuzzles(puzzles) {
         const orderedPuzzles = this.orderForTwoColumnUL(puzzles);
@@ -40,20 +58,33 @@ class Inventory extends Component {
                 </ul>);
     }
 
-    renderPuzzlesByArc(puzzles) {
-        const byArc = puzzles.reduce((groups, puzzle) => {
-            const arc = puzzle.Arc;
-            groups[arc] = groups[arc] || [];
-            groups[arc].push(puzzle);
+    renderGroupedList(groupName, contents) {
+        if (this.state.collapsedGroups.has(groupName)) {
+            return (<li className="groupHeader closed"
+                        key={`${groupName}-${contents.length}-closed`}
+                        onClick={e => this.toggleCollapsed(e, groupName)}>
+                      {groupName}
+                    </li>);
+        } else {
+            return (<li className="groupHeader opened"
+                        key={`${groupName}-${contents.length}-opened`}
+                        onClick={e => this.toggleCollapsed(e, groupName)}>
+                      {groupName}
+                      {this.renderUngroupedPuzzles(contents)}
+                    </li>);
+        }
+    }
+
+    renderPuzzlesByGroup(puzzles, groupType, groupName) {
+        const byGroup = puzzles.reduce((groups, puzzle) => {
+            const g = puzzle[groupType];
+            groups[g] = groups[g] || [];
+            groups[g].push(puzzle);
             return groups;
         }, {});
 
-        const arcs = Object.keys(byArc).sort();
-
-        return arcs.map(
-            a => (<li className="groupHeader opened">{a}
-                  {this.renderUngroupedPuzzles(byArc[a])}
-                  </li>));
+        return Object.keys(byGroup).sort().map(
+            a => this.renderGroupedList(a, byGroup[a]));
     }
 
     renderList() {
@@ -61,7 +92,7 @@ class Inventory extends Component {
 
         switch (this.state.groupBy) {
             case "None": return this.renderUngroupedPuzzles(puzzles);
-            case "Arc": return this.renderPuzzlesByArc(puzzles);
+            case "Arc": return this.renderPuzzlesByGroup(puzzles, "Arc");
             default : alert(this.state.groupBy);
         }
     }
