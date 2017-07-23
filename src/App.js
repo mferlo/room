@@ -62,18 +62,25 @@ class AppState {
         const count = 25;
         const arcs = [ '#', 'X', '@' ];
 
-        const titles = [ "Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit", "Ut", "at", "magna", "Vestibulum", "sed", "ante", "et", "orci", "mattis", "blandit", "nec", "in", "metus", "Mauris", "rhoncus", "maximus", "velit", "ac", "lobortis", "lacus", "sollicitudin", "faucibus", "Suspendisse", "et", "commodo", "sapien" ];
-        
         let puzzles = [];
         for (let i = 0; i < count; i++) {
             puzzles.push({
-                Title: titles[i].substring(0, 6),
+                Title: AppState.makeFakeTitle(i),
                 Arc: arcs[i % arcs.length],
                 Solved: i % 4 === 0
             });
         }
 
+        puzzles.sort((a, b) => a.Title.localeCompare(b.Title));
+
         return puzzles;
+    }
+
+    static makeFakeTitle(i) {
+        const titles = [ "Lorem", "Ipsum", "Dolor", "Sit", "Amet", "Consectetur", "Adipiscing", "Elit", "Ut", "At", "Magna", "Vestibulum", "Sed", "Ante", "Et", "Orci", "Mattis", "Blandit", "Nec", "In", "Metus", "Mauris", "Rhoncus", "Maximus", "Velit", "Ac", "Lobortis", "Lacus", "Sollicitudin", "Faucibus", "Suspendisse", "Et", "Commodo", "Sapien" ];
+
+        return titles[i].substring(0, 6);
+
     }
 
     static appendMessage(prev, message) {

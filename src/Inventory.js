@@ -58,6 +58,7 @@ class Inventory extends Component {
         return (<li className="puzzleItem" key={`Puzzle-${puzzle.Title}`}>
                   <div className="puzzle">
                     {puzzle.Arc} <span style={{float: 'right'}}>{solvedDisplay}</span>
+                    <br />
                     {puzzle.Title}
                   </div>
                 </li>);
@@ -78,7 +79,7 @@ class Inventory extends Component {
     }
 
     isVisible(puzzle) {
-        return `${puzzle.Title}`.includes(this.state.search)
+        return puzzle.Title.toLowerCase().includes(this.state.search.toLowerCase())
             && this.state.filteredTypes.has(puzzle.Arc)
             && this.state.filteredTypes.has(puzzle.Solved ? '☑' : '☐');
     }
