@@ -2,13 +2,21 @@ import React, { Component } from 'react';
 
 class Inventory extends Component {
 
+    static groupTypes() {
+        return ["All", "Arc", "Solved"];
+    }
+
+    static filterTypes() {
+        return [ '#', 'X', '@', '☐', '☑' ];
+    }
+
     constructor(props) {
         super(props);
 
         this.state = {
             groupBy: 'All',
             collapsedGroups: new Set(),
-            filteredTypes: new Set()
+            filteredTypes: new Set(Inventory.filterTypes())
         };
     }
 
@@ -17,40 +25,38 @@ class Inventory extends Component {
         this.setState({ groupBy: groupName });
     }
 
-    renderSelector(groupType, selected) {
+    renderSelector(groupType) {
         return (<span onClick={(e) => this.groupBy(e, groupType)}
                       key={groupType}
-                      className={`groupType ${selected ? 'selected' : ''}`}>
+                      className={`groupType ${this.state.groupBy === groupType ? 'selected' : 'unselected'}`}>
                     {groupType}
                 </span>);
     }
 
     renderSelectors() {
-        const selected = this.state.groupBy;
-        return (
-            <div>
-                {["All", "Arc", "Solved"].map(
-                    groupType => this.renderSelector(groupType, groupType === selected))}
-            </div>
-        );
+        return <div>Group By: {Inventory.groupTypes().map(g => this.renderSelector(g))}</div>;
+    }
+
+    renderFilter(filterType) {
+        return (<span onClick={(e) => this.toggle(e, filterType, 'filteredTypes')}
+                      key={filterType}
+                      className={`filterType ${this.state.filteredTypes.has(filterType) ? 'selected' : 'unselected'}`}>
+                  {filterType}
+                </span>);
+    }
+
+    renderFilters() {
+        return <div>Show: {Inventory.filterTypes().map(i => this.renderFilter(i))}</div>;
     }
 
     renderPuzzle(puzzle) {
-        let arcText;
-        switch (puzzle.Arc) {
-            case 'foo': arcText = '#'; break;
-            case 'bar': arcText = '>'; break;
-            case 'baz': arcText = '@'; break;
-            default: arcText = `Unknown arc ${puzzle.Arc}`; break;
-        }
-
         const solvedDisplay = puzzle.Solved
               ? <span className="status solved">☑</span>
               : <span className="status unsolved">☐</span>
 
         return (<li className="puzzleItem" key={`Puzzle-${puzzle.Id}`}>
                   <div className="puzzle" style={{backgroundColor: puzzle.Display}}>
-                    {solvedDisplay} {arcText} {puzzle.Id}
+                    {solvedDisplay} {puzzle.Arc} {puzzle.Id}
                   </div>
                 </li>);
     }
@@ -69,17 +75,20 @@ class Inventory extends Component {
         });
     }
 
-    renderUngroupedPuzzles(puzzles) {
-        const orderedPuzzles = this.orderForTwoColumnUL(puzzles);
+    isVisible(puzzle) {
+        return this.state.filteredTypes.has(puzzle.Arc)
+            && this.state.filteredTypes.has(puzzle.Solved ? '☑' : '☐');
+    }
 
-        return (<ul className="puzzleList">
-                  {orderedPuzzles.map(p => this.renderPuzzle(p))}
-                </ul>);
+    renderUngroupedPuzzles(puzzles) {
+        const orderedPuzzles = this.orderForTwoColumnUL(puzzles.filter(p => this.isVisible(p)));
+
+        return (<ul className="puzzleList">{orderedPuzzles.map(p => this.renderPuzzle(p))}</ul>);
     }
 
     renderGroupedList(groupName, contents) {
-        const collapsed = this.state.collapsedGroups.has(groupName);
-        const state = collapsed ? "closed" : "opened";
+        const opened = !this.state.collapsedGroups.has(groupName);
+        const state = opened ? "opened" : "closed";
 
         let displayName = groupName;
         if (groupName === "true") {
@@ -92,7 +101,7 @@ class Inventory extends Component {
                     key={`${groupName}-${contents.length}-${state}`}
                     onClick={e => this.toggle(e, groupName, 'collapsedGroups')}>
                       {displayName}
-                      {collapsed || this.renderUngroupedPuzzles(contents)}
+                      {opened && this.renderUngroupedPuzzles(contents)}
                 </li>);
     }
 
@@ -122,6 +131,8 @@ class Inventory extends Component {
     render() {
         return (<div id="puzzle-inventory">
                 {this.renderSelectors()}
+                <br />
+                {this.renderFilters()}
                 <br />
                 {this.renderList()}
                 </div>);

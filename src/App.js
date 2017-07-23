@@ -60,15 +60,13 @@ class AppState {
 
     static makeFakePuzzles() {
         const count = 25;
-        const arcs = [ 'foo', 'bar', 'baz' ];
+        const arcs = [ '#', 'X', '@' ];
         
         let puzzles = [];
         for (let i = 0; i < count; i++) {
             const id = 100 + i;
             const puzzle = {
                 Id: id,
-                Type: 'Puzzle',
-                Description: `Puzzle ${id}`,
                 Arc: arcs[i % arcs.length],
                 Solved: i % 4 === 0
             }

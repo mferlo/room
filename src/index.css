@@ -45,14 +45,16 @@ span.status { font-weight: bold; }
 span.solved { color: green; }
 span.unsolved { color: red; }
 
-span.groupType {
+span.unselected {
     margin: 10px;
     border: 2px solid black;
-    background-color: #22222222;
+    background-color: #22222255;
 }
 
-span.groupType.selected {
-    background-color: #0000FF88;
+span.selected {
+    margin: 10px;
+    border: 2px solid black;
+    background-color: #0000FF55;
 }
 
 .door {
