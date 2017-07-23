@@ -5,7 +5,20 @@ class Inventory extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { groupBy: 'none' };
+        this.state = { groupBy: 'None' };
+    }
+
+    groupBy(g) {
+        this.setState({ groupBy: g });
+    }
+
+    renderSelector() {
+        return (
+            <div>
+                <span onClick={() => this.groupBy("None")}>None</span>
+                <span onClick={() => this.groupBy("Arc")}>Arc</span>
+            </div>
+        );
     }
 
     renderPuzzle(puzzle) {
@@ -27,17 +40,36 @@ class Inventory extends Component {
                 </ul>);
     }
 
+    renderPuzzlesByArc(puzzles) {
+        const byArc = puzzles.reduce((groups, puzzle) => {
+            const arc = puzzle.Arc;
+            groups[arc] = groups[arc] || [];
+            groups[arc].push(puzzle);
+            return groups;
+        }, {});
+
+        const arcs = Object.keys(byArc).sort();
+
+        return arcs.map(
+            a => (<li className="groupHeader opened">{a}
+                  {this.renderUngroupedPuzzles(byArc[a])}
+                  </li>));
+    }
+
     renderList() {
         const puzzles = this.props.contents;
 
         switch (this.state.groupBy) {
-            case "none": return this.renderUngroupedPuzzles(puzzles);
-            default: alert(this.state.groupBy);
+            case "None": return this.renderUngroupedPuzzles(puzzles);
+            case "Arc": return this.renderPuzzlesByArc(puzzles);
+            default : alert(this.state.groupBy);
         }
     }
 
     render() {
         return (<div id="puzzle-inventory">
+                {this.renderSelector()}
+                <br />
                 {this.renderList()}
                 </div>);
     }

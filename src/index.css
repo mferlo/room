@@ -26,18 +26,12 @@ body {
     overflow-y: scroll;
 }
 
-ul.puzzleList {
-    list-style: none;
-    columns: 2;
-}
-  
+ul.puzzleList { columns: 2; }
+
+li.groupHeader { list-style-position:inside; }
 li.groupHeader.closed { list-style-type: '+ '; }
 li.groupHeader.opened { list-style-type: '- '; }
-
-li.puzzleItem {
-    list-style: none;
-    break-inside: avoid;
-}
+li.puzzleItem { list-style: none; break-inside: avoid; }
 
 div.puzzle {
     border: 1px solid green;
